@@ -1,6 +1,6 @@
 #pragma once
 
-void inverse_lyndon(char const *text, int *ngs, int *nlce, int *pgs, int *plce, int *borders, int n) {
+void inverse_lyndon(char const *text, int *ngs, int *nlce, int *pgs, int *plce, int n) {
   auto T_l = [&](int x) { return (x >= 0) ? ((int)text[x]) : ((int)+256); };
   auto T_r = [&](int x) { return (x < n) ? ((int)text[x]) : ((int)+256); };
 
@@ -18,17 +18,7 @@ void inverse_lyndon(char const *text, int *ngs, int *nlce, int *pgs, int *plce, 
     rhs = r + known_lce;
     d = r - l;
     return known_lce;
-  };
-
-  auto border_size = [&](int l, int r) {
-    int border = 0;
-    while(T_l(l) == T_r(r)){
-      ++l;
-      ++r;
-      ++border;
-    }
-    return border;
-  };
+  }; // qui si può prendere il bordo senza la seconda lambda
 
   for (int r = 0; r < n; ++r) {
     int l = r - 1;
@@ -36,7 +26,6 @@ void inverse_lyndon(char const *text, int *ngs, int *nlce, int *pgs, int *plce, 
     while (T_l(l + lce) < T_r(r + lce)) {
       ngs[l] = r;
       nlce[l] = lce;
-      borders[l] = border_size(l, r);
       if (lce == plce[l]) {
         lce = extend_lce(pgs[l], r, lce);
       } else if (lce > plce[l]) {

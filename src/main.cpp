@@ -6,6 +6,7 @@
 #include <random>
 #include <string>
 #include <vector>
+#include <chrono>
 #include "inverse-lyndon.hpp"
 
 void verify(char const *text,  // the input text
@@ -40,7 +41,7 @@ void verify(char const *text,  // the input text
 
     for (int j = i - 1; j > ps; j = pss[j]) {
       auto l = lce(j, i);
-      if (i + l < n && text[j + l] < text[i + l]) {
+      if (i + l < n && text[j + l] > text[i + l]) {
         std::cout << "pss[" << i << "]=" << j << ", but algorithm claims "
                   << "pss[" << i << "]=" << pss[j] << std::endl;
         std::abort();
@@ -49,7 +50,7 @@ void verify(char const *text,  // the input text
 
     if (ps >= 0) {
       auto l = lce(ps, i);
-      if (i + l >= n || text[ps + l] > text[i + l]) {
+      if (i + l >= n || text[ps + l] < text[i + l]) {
         std::cout << "pss[" << i << "]<" << ps << ", but algorithm claims "
                   << "pss[" << i << "]=" << ps << std::endl;
         std::abort();
@@ -76,7 +77,7 @@ void verify(char const *text,  // the input text
 
     for (int j = i + 1; j < ns; j = nss[j]) {
       auto l = lce(i, j);
-      if (j + l >= n || text[i + l] > text[j + l]) {
+      if (j + l >= n || text[i + l] < text[j + l]) {
         std::cout << "nss[" << i << "]=" << j << ", but algorithm claims "
                   << "nss[" << i << "]=" << nss[j] << std::endl;
         std::abort();
@@ -85,7 +86,7 @@ void verify(char const *text,  // the input text
 
     if (ns < n) {
       auto l = lce(i, ns);
-      if (ns + l < n && text[i + l] < text[ns + l]) {
+      if (ns + l < n && text[i + l] > text[ns + l]) {
         std::cout << "nss[" << i << "]>" << ns << ", but algorithm claims "
                   << "nss[" << i << "]=" << ns << std::endl;
         std::abort();
@@ -148,15 +149,38 @@ int main(int argc, char *argv[]) {
     std::cout << std::endl;
   }
 
-  std::vector<int> nss(n);
-  std::vector<int> nss_lce(n);
-  std::vector<int> pss(n);
-  std::vector<int> pss_lce(n);
-  std::vector<int> borders(n);
+  std::vector<int> ngs(n);
+  std::vector<int> ngs_lce(n);
+  std::vector<int> pgs(n);
+  std::vector<int> pgs_lce(n);
+  std::vector<int> inverse_lyndon_array(n);
 
-  inverse_lyndon(string.data(), nss.data(), nss_lce.data(), pss.data(), pss_lce.data(), borders.data(),
+  // Timing the inverse_lyndon function
+  auto start_ngs = std::chrono::high_resolution_clock::now();
+
+  inverse_lyndon(string.data(), ngs.data(), ngs_lce.data(), pgs.data(), pgs_lce.data(),
          n);
 
+  auto end_ngs = std::chrono::high_resolution_clock::now();
+
+  auto duration_ngs = std::chrono::duration_cast<std::chrono::microseconds>(end_ngs - start_ngs).count();
+
+  // Timing the inverse lyndon array calculation
+  auto start_inverse = std::chrono::high_resolution_clock::now();
+
+  for(size_t i = 0; i < n; i++){
+    inverse_lyndon_array[i] = ngs[i] - i + ngs_lce[i];
+  }
+
+  auto end_inverse = std::chrono::high_resolution_clock::now();
+  auto duration_inverse = std::chrono::duration_cast<std::chrono::microseconds>(end_inverse - start_inverse).count();
+
+  verify(string.data(), ngs.data(), ngs_lce.data(), pgs.data(), pgs_lce.data(),
+         n);
+
+  std::cout << duration_ngs << "," << duration_inverse << std::endl;
+
+/*
   std::cout << "ngs: ";
   for (auto next : nss)
     std::cout << next << " ";
@@ -167,23 +191,16 @@ int main(int argc, char *argv[]) {
     std::cout <<prev << " ";
   std::cout << std::endl;
 
-  std::cout << "borders: ";
-  for (auto border: borders)
-      std::cout << border << " ";
+    std::cout << "nlce (borders): ";
+  for (auto nlce: nss_lce)
+      std::cout << nlce << " ";
   std::cout << std::endl;
-  /*verify(string.data(), nss.data(), nss_lce.data(), pss.data(), pss_lce.data(),
-         n);*/
-
-  std::vector<int> inverse_lyndon(n);
-
-  for(size_t i = 0; i < n; i++){
-    inverse_lyndon[i] = nss[i] - i + borders[i];
-  }
 
   std::cout << "inverse-lyn-array: ";
   for (auto inverse_word_length: inverse_lyndon)
       std::cout << inverse_word_length << " ";
   std::cout << std::endl;
+*/
 
   return 0;
 }
