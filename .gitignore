@@ -35,3 +35,4 @@
 *build
 test_*
 *.cache
+.DS_Store

@@ -18,7 +18,7 @@ void inverse_lyndon(char const *text, int *ngs, int *nlce, int *pgs, int *plce, 
     rhs = r + known_lce;
     d = r - l;
     return known_lce;
-  }; // qui si può prendere il bordo senza la seconda lambda
+  };
 
   for (int r = 0; r < n; ++r) {
     int l = r - 1;

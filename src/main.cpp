@@ -9,11 +9,11 @@
 #include <chrono>
 #include "inverse-lyndon.hpp"
 
-void verify(char const *text,  // the input text
-            int *nss,          // next smaller suffixes (nss)
-            int *nss_lce,      // lces associated with nss
-            int *pss,          // previous smaller suffixes (pss)
-            int *pss_lce,      // lces associated with pss
+void verify(char const *text,
+            int *nss,
+            int *nss_lce,
+            int *pss,
+            int *pss_lce,
             int n) {
   std::cout << "Verifying..." << std::endl;
   if (n <= 20) {
@@ -32,9 +32,6 @@ void verify(char const *text,  // the input text
   for (int i = 0; i < n; ++i) {
     if ((n - i - 1) % rate == 0)
       std::cout << 100 - 10 * ((n - i - 1) / rate) << "% "  << std::flush;
-
-    // check pss. we already verified pss[i'] and plce[i'] for i' < i such that
-    // we can use these values for verification of pss[i] and plce[i]
 
     int ps = pss[i];
     int pl = pss_lce[i];
@@ -68,9 +65,6 @@ void verify(char const *text,  // the input text
   for (int i = n - 1; i >= 0; --i) {
      if (i % rate == 0)
        std::cout << 100 - (10 * (i / rate)) << "% "  << std::flush;
-
-    // check nss. we already verified nss[i'] and nlce[i'] for i' > i such that
-    // we can use these values for verification of nss[i] and nlce[i]
 
     int ns = nss[i];
     int nl = nss_lce[i];
@@ -179,28 +173,6 @@ int main(int argc, char *argv[]) {
          n);
 
   std::cout << duration_ngs << "," << duration_inverse << std::endl;
-
-/*
-  std::cout << "ngs: ";
-  for (auto next : nss)
-    std::cout << next << " ";
-  std::cout << std::endl;
-
-  std::cout << "pgs: ";
-  for (auto prev: pss)
-    std::cout <<prev << " ";
-  std::cout << std::endl;
-
-    std::cout << "nlce (borders): ";
-  for (auto nlce: nss_lce)
-      std::cout << nlce << " ";
-  std::cout << std::endl;
-
-  std::cout << "inverse-lyn-array: ";
-  for (auto inverse_word_length: inverse_lyndon)
-      std::cout << inverse_word_length << " ";
-  std::cout << std::endl;
-*/
 
   return 0;
 }
